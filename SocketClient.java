@@ -6,6 +6,8 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class SocketClient extends JFrame implements ActionListener, Runnable {
     private JTextArea chatHistory;
@@ -127,8 +129,22 @@ public class SocketClient extends JFrame implements ActionListener, Runnable {
         try {
             String message;
             while ((message = reader.readLine()) != null) {
-                chatHistory.append(message + "\n");
-                chatHistory.setCaretPosition(chatHistory.getText().length()); // Auto-scroll to the latest message
+                // Assuming the message is formatted as "[nickname] message"
+                int nicknameEnd = message.indexOf(']') + 1;  // Find the end of the nickname
+                String nickname = message.substring(1, nicknameEnd - 1);  // Extract nickname from the message
+                String messageContent = message.substring(nicknameEnd + 1).trim();  // Extract the actual message
+
+                // Create a timestamp for the message
+                String timestamp = new SimpleDateFormat("HH:mm:ss").format(new Date());
+
+                // Format message as "timestamp: [nickname] message"
+                String formattedMessage = String.format("%s: [%s] %s", timestamp, nickname, messageContent);
+
+                // Append the formatted message to chatHistory
+                chatHistory.append(formattedMessage + "\n");
+
+                // Auto-scroll to the latest message if the chat history was scrolled down
+                chatHistory.setCaretPosition(chatHistory.getText().length());
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Connection lost: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -139,7 +155,7 @@ public class SocketClient extends JFrame implements ActionListener, Runnable {
     public void actionPerformed(ActionEvent e) {
         String message = messageInput.getText().trim();
         if (!message.isEmpty()) {
-            writer.println(message);
+            writer.println(message);  // Send the message
             messageInput.setText("");  // Clear the input field after sending
             messageInput.requestFocusInWindow();  // Keep focus on the input field
         }
