@@ -51,11 +51,15 @@ javac SocketServer.java SocketClient.java
 ```bash
 java SocketServer
 ```
-3. Connect:
+3. Run the client afterwards:
+```bash
+java SocketClient
+```
+4. Connect:
 - The UI will prompt you for the server IP address and your nickname. 
 - Enter ```localhost``` if you're testing locally
 - Once connected, you can start sending and receiving messages
-4. Connect Multiple Clients:
+5. Connect Multiple Clients:
 - You can run multiple instances of the SocketClient on different terminals or IDEs. Each client can connect to the server, and the chat messages will be broadcast to all connected clients in real-time
 - Each client will prompt for a unique nickname when connecting. Multiple users can join the chat using different names
 
