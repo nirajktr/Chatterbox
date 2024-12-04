@@ -75,7 +75,7 @@ class ServerThread extends Thread {
             // writing
             pw = new PrintWriter(server.sk.getOutputStream(), true);
             name = br.readLine();
-            server.broadCast("**["+name+"] Entered**");
+            server.broadCast("**["+name+"] has entered the chatroom**");
 
             String data;
             while((data = br.readLine()) != null ){

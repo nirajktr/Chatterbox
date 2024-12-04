@@ -16,12 +16,12 @@ public class SocketClient extends JFrame implements ActionListener, Runnable {
     private PrintWriter writer;
 
     public SocketClient() {
-        super("Chat Application");
+        super("Chatterbox - Client");
         initializeUI();
     }
 
     private void initializeUI() {
-        // Set Look and Feel
+        // Set Look and Feel (System Look)
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
@@ -31,12 +31,12 @@ public class SocketClient extends JFrame implements ActionListener, Runnable {
         // Main Layout
         setLayout(new BorderLayout());
 
-        // Header Panel
+        // Header Panel (Dark with Green Text)
         JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        headerPanel.setBackground(new Color(30, 144, 255));
-        JLabel titleLabel = new JLabel("Chat Application");
-        titleLabel.setFont(new Font("SansSerif", Font.BOLD, 18));
-        titleLabel.setForeground(Color.WHITE);
+        headerPanel.setBackground(new Color(0, 0, 0));  // Black background
+        JLabel titleLabel = new JLabel("The Dark Room...");
+        titleLabel.setFont(new Font("Monospaced", Font.BOLD, 20));
+        titleLabel.setForeground(new Color(0, 255, 0));  // Green text for old-school look
         headerPanel.add(titleLabel);
         add(headerPanel, BorderLayout.NORTH);
 
@@ -44,31 +44,58 @@ public class SocketClient extends JFrame implements ActionListener, Runnable {
         chatHistory = new JTextArea();
         chatHistory.setFont(new Font("Monospaced", Font.PLAIN, 14));
         chatHistory.setEditable(false);
-        chatHistory.setBackground(new Color(245, 245, 245));
+        chatHistory.setBackground(new Color(0, 0, 0));  // Black background
+        chatHistory.setForeground(new Color(0, 255, 0));  // Green text
+        chatHistory.setLineWrap(true);
+        chatHistory.setWrapStyleWord(true);
         JScrollPane chatScrollPane = new JScrollPane(chatHistory);
+        chatScrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         add(chatScrollPane, BorderLayout.CENTER);
 
-        // Input Panel
+        // Input Panel (Dark with Green Text)
         JPanel inputPanel = new JPanel(new BorderLayout(10, 10));
+        inputPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         messageInput = new JTextField();
-        messageInput.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        messageInput.setFont(new Font("Monospaced", Font.PLAIN, 14));
+        messageInput.setBackground(new Color(20, 20, 20));  // Very dark gray for input
+        messageInput.setForeground(new Color(0, 255, 0));  // Green text for input
+        messageInput.setCaretColor(Color.GREEN);  // Green caret for consistency
         messageInput.setToolTipText("Type your message here...");
         inputPanel.add(messageInput, BorderLayout.CENTER);
 
         sendButton = new JButton("Send");
-        sendButton.setFont(new Font("SansSerif", Font.BOLD, 14));
+        sendButton.setFont(new Font("Monospaced", Font.BOLD, 14));
+        sendButton.setBackground(new Color(0, 0, 128)); // Dark Blue button
+        sendButton.setForeground(Color.BLACK);  // Black text
+        sendButton.setFocusPainted(false);
+        sendButton.setPreferredSize(new Dimension(100, 40));
         sendButton.addActionListener(this);
+        sendButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        // Hover effect for button
+        sendButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                sendButton.setBackground(new Color(70, 130, 180)); // Lighter on hover
+            }
+
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                sendButton.setBackground(new Color(0, 0, 128)); // Reset on exit
+            }
+        });
         inputPanel.add(sendButton, BorderLayout.EAST);
 
         add(inputPanel, BorderLayout.SOUTH);
 
+        // Add ActionListener to messageInput for Enter key press
+        messageInput.addActionListener(this);
+
         // Frame Settings
-        setSize(500, 600);
-        setLocationRelativeTo(null);
+        setSize(600, 700);
+        setLocationRelativeTo(null);  // Center the window
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
 
-        messageInput.requestFocusInWindow();
+        messageInput.requestFocusInWindow(); // Auto-focus on the input field when the app starts
     }
 
     public void connectToServer() {
@@ -88,7 +115,7 @@ public class SocketClient extends JFrame implements ActionListener, Runnable {
             // Send nickname to server
             writer.println(nickname);
 
-            // Start listening to server
+            // Start listening to server in a new thread
             new Thread(this).start();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Unable to connect to server: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -101,7 +128,7 @@ public class SocketClient extends JFrame implements ActionListener, Runnable {
             String message;
             while ((message = reader.readLine()) != null) {
                 chatHistory.append(message + "\n");
-                chatHistory.setCaretPosition(chatHistory.getText().length());
+                chatHistory.setCaretPosition(chatHistory.getText().length()); // Auto-scroll to the latest message
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Connection lost: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -113,14 +140,15 @@ public class SocketClient extends JFrame implements ActionListener, Runnable {
         String message = messageInput.getText().trim();
         if (!message.isEmpty()) {
             writer.println(message);
-            messageInput.setText("");
+            messageInput.setText("");  // Clear the input field after sending
+            messageInput.requestFocusInWindow();  // Keep focus on the input field
         }
     }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             SocketClient client = new SocketClient();
-            client.connectToServer();
+            client.connectToServer();  // Start connection after UI is loaded
         });
     }
 }
