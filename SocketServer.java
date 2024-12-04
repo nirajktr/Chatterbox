@@ -8,40 +8,42 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 public class SocketServer {
-    ServerSocket server;
-    Socket sk;
-    InetAddress addr;
+    ServerSocket server; // Server socket to accept client connections
+    Socket sk; // Socket for individual client connection
+    InetAddress addr; // Server address
     
-    ArrayList<ServerThread> list = new ArrayList<ServerThread>();
+    ArrayList<ServerThread> list = new ArrayList<ServerThread>(); // List to keep track of connected clients
 
     public SocketServer() {
         try {
-        	addr = InetAddress.getByName("127.0.0.1");
-        	//addr = InetAddress.getByName("192.168.43.1");
+            addr = InetAddress.getByName("127.0.0.1"); // Localhost address
+            // addr = InetAddress.getByName("192.168.43.1"); // Example for a different address
             
-        	server = new ServerSocket(1234,50,addr);
+            server = new ServerSocket(1234, 50, addr); // Create server socket on port 1234
             System.out.println("\n Waiting for Client connection");
-            SocketClient.main(null);
-            while(true) {
-                sk = server.accept();
-                System.out.println(sk.getInetAddress() + " connect");
+            
+            while (true) {
+                sk = server.accept(); // Accept client connection
+                System.out.println(sk.getInetAddress() + " connected");
 
-                //Thread connected clients to ArrayList
+                // Create and start a new thread for the connected client
                 ServerThread st = new ServerThread(this);
                 addThread(st);
                 st.start();
             }
-        } catch(IOException e) {
-            System.out.println(e + "-> ServerSocket failed");
+        } catch (IOException e) {
+            System.out.println(e + " -> ServerSocket failed");
         }
     }
 
+    // Add a client thread to the list
     public void addThread(ServerThread st) {
         list.add(st);
     }
 
-    public void removeThread(ServerThread st){
-        list.remove(st); //remove
+    // Remove a client thread from the list
+    public void removeThread(ServerThread st) {
+        list.remove(st);
     }
 
     public void broadCast(String message){
